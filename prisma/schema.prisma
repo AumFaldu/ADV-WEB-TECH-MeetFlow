@@ -16,7 +16,7 @@ model users {
   Created      DateTime?  @default(now()) @map("created")
   Modified     DateTime?  @default(now()) @map("modified")
   UserName     String?    @map("username")
-  staff        staff?     @relation(fields: [StaffID], references: [staffid])
+  staff        staff?     @relation(fields: [StaffID], references: [StaffID])
 
   @@index([StaffID])
 }
@@ -32,7 +32,7 @@ model staff {
   DepartmentID   Int?            @map("departmentid")
   meetingmembers meetingmember[]
   users          users[]
-  department     department?     @relation(fields: [DepartmentID], references: [departmentid], onDelete: Cascade)
+  department     department?     @relation(fields: [DepartmentID], references: [DepartmentID], onDelete: Cascade)
 
   @@index([DepartmentID])
 }
@@ -50,8 +50,8 @@ model meetings {
   CancellationReason   String?         @map("cancellationreason")
   VenueID              Int?            @map("venueid")
   meetingmembers       meetingmember[]
-  meetingtype          meetingtype     @relation(fields: [MeetingTypeID], references: [meetingtypeid], onDelete: Cascade)
-  venue                venue?          @relation(fields: [VenueID], references: [venueid], onDelete: Cascade)
+  meetingtype          meetingtype     @relation(fields: [MeetingTypeID], references: [MeetingTypeID], onDelete: Cascade)
+  venue                venue?          @relation(fields: [VenueID], references: [VenueID], onDelete: Cascade)
 
   @@index([MeetingTypeID])
   @@index([VenueID])
@@ -75,8 +75,8 @@ model meetingmember {
   Remarks         String?   @map("remarks")
   Created         DateTime? @default(now()) @map("created")
   Modified        DateTime? @default(now()) @map("modified")
-  meetings        meetings  @relation(fields: [MeetingID], references: [meetingid], onDelete: Cascade)
-  staff           staff     @relation(fields: [StaffID], references: [staffid], onDelete: Cascade)
+  meetings        meetings  @relation(fields: [MeetingID], references: [MeetingID], onDelete: Cascade)
+  staff           staff     @relation(fields: [StaffID], references: [StaffID], onDelete: Cascade)
 
   @@unique([MeetingID, StaffID])
   @@index([StaffID])
