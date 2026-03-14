@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { postgres } from "@prisma/adapter-postgres";
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -7,10 +8,7 @@ declare global {
 const prisma =
   global.prisma ||
   new PrismaClient({
-    adapter: {
-      type: "postgresql",
-      url: process.env.DATABASE_URL,
-    },
+    adapter: postgres({url: process.env.DATABASE_URL}),
     log: ["query", "info", "warn", "error"],
   });
 
