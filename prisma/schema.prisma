@@ -36,8 +36,6 @@ model staff {
 
   @@index([departmentid])
 }
-
-// Meetings
 model meetings {
   meetingid            Int       @id @default(autoincrement()) @map("meetingid")
   meetingdate          DateTime  @map("meetingdate")
