@@ -13,7 +13,7 @@ model users {
   UserID       Int        @id @default(autoincrement()) @map("userid")
   StaffID      Int?       @map("staffid")
   Email        String?    @unique @map("email")
-  PasswordHash String     @map("password_hash")
+  Password_Hash String     @map("password_hash")
   Role         users_Role? @default(STAFF) @map("role")
   IsActive     Boolean?   @default(true) @map("isactive")
   Created      DateTime?  @default(now()) @map("created")
