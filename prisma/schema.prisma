@@ -8,96 +8,97 @@ datasource db {
 }
 
 model users {
-  UserID   Int        @id @default(autoincrement())
-  StaffID  Int?
-  Email    String?    @unique
-  Password_Hash String
-  Role     users_Role? @default(STAFF)
-  IsActive Boolean?   @default(true)
-  Created  DateTime?  @default(now())
-  Modified DateTime?  @default(now())
-  UserName String?
-  staff    staff?     @relation(fields: [StaffID], references: [StaffID])
+  UserID       Int        @id @default(autoincrement()) @map("userid")
+  StaffID      Int?       @map("staffid")
+  Email        String?    @unique @map("email")
+  Password_Hash String    @map("password_hash")
+  Role         users_Role? @default(STAFF) @map("role")
+  IsActive     Boolean?   @default(true) @map("isactive")
+  Created      DateTime?  @default(now()) @map("created")
+  Modified     DateTime?  @default(now()) @map("modified")
+  UserName     String?    @map("username")
+  staff        staff?     @relation(fields: [StaffID], references: [staffid])
 
   @@index([StaffID])
 }
 
 model staff {
-  StaffID      Int             @id @default(autoincrement())
-  StaffName    String
-  MobileNo     String?
-  EmailAddress String?
-  Remarks      String?
-  Created      DateTime?       @default(now())
-  Modified     DateTime?       @default(now())
-  DepartmentID Int?
+  StaffID        Int             @id @default(autoincrement()) @map("staffid")
+  StaffName      String          @map("staffname")
+  MobileNo       String?         @map("mobileno")
+  EmailAddress   String?         @map("emailaddress")
+  Remarks        String?         @map("remarks")
+  Created        DateTime?       @default(now()) @map("created")
+  Modified       DateTime?       @default(now()) @map("modified")
+  DepartmentID   Int?            @map("departmentid")
   meetingmembers meetingmember[]
-  users        users[]
-  department   department?     @relation(fields: [DepartmentID], references: [DepartmentID], onDelete: Cascade)
+  users          users[]
+  department     department?     @relation(fields: [DepartmentID], references: [departmentid], onDelete: Cascade)
 
   @@index([DepartmentID])
 }
 
 model meetings {
-  MeetingID          Int             @id @default(autoincrement())
-  MeetingDate        DateTime
-  MeetingTypeID      Int
-  MeetingDescription String?
-  DocumentPath       String?
-  Created            DateTime?       @default(now())
-  Modified           DateTime?       @default(now())
-  IsCancelled        Boolean?        @default(false)
-  CancellationDateTime DateTime?
-  CancellationReason String?
-  VenueID            Int?
-  meetingmembers     meetingmember[]
-  meetingtype        meetingtype     @relation(fields: [MeetingTypeID], references: [MeetingTypeID], onDelete: Cascade)
-  venue              venue?          @relation(fields: [VenueID], references: [VenueID], onDelete: Cascade)
+  MeetingID            Int             @id @default(autoincrement()) @map("meetingid")
+  MeetingDate          DateTime        @map("meetingdate")
+  MeetingTypeID        Int             @map("meetingtypeid")
+  MeetingDescription   String?         @map("meetingdescription")
+  DocumentPath         String?         @map("documentpath")
+  Created              DateTime?       @default(now()) @map("created")
+  Modified             DateTime?       @default(now()) @map("modified")
+  IsCancelled          Boolean?        @default(false) @map("iscancelled")
+  CancellationDateTime DateTime?       @map("cancellationdatetime")
+  CancellationReason   String?         @map("cancellationreason")
+  VenueID              Int?            @map("venueid")
+  meetingmembers       meetingmember[]
+  meetingtype          meetingtype     @relation(fields: [MeetingTypeID], references: [meetingtypeid], onDelete: Cascade)
+  venue                venue?          @relation(fields: [VenueID], references: [venueid], onDelete: Cascade)
 
   @@index([MeetingTypeID])
   @@index([VenueID])
 }
 
+// Similarly, map all other models:
 model meetingtype {
-  MeetingTypeID   Int        @id @default(autoincrement())
-  MeetingTypeName String
-  Remarks         String?
-  Created         DateTime?  @default(now())
-  Modified        DateTime?  @default(now())
+  MeetingTypeID   Int        @id @default(autoincrement()) @map("meetingtypeid")
+  MeetingTypeName String     @map("meetingtypename")
+  Remarks         String?    @map("remarks")
+  Created         DateTime?  @default(now()) @map("created")
+  Modified        DateTime?  @default(now()) @map("modified")
   meetings        meetings[]
 }
 
 model meetingmember {
-  MeetingMemberID Int       @id @default(autoincrement())
-  MeetingID       Int
-  StaffID         Int
-  IsPresent       Boolean?  @default(false)
-  Remarks         String?
-  Created         DateTime? @default(now())
-  Modified        DateTime? @default(now())
-  meetings        meetings  @relation(fields: [MeetingID], references: [MeetingID], onDelete: Cascade)
-  staff           staff     @relation(fields: [StaffID], references: [StaffID], onDelete: Cascade)
+  MeetingMemberID Int       @id @default(autoincrement()) @map("meetingmemberid")
+  MeetingID       Int       @map("meetingid")
+  StaffID         Int       @map("staffid")
+  IsPresent       Boolean?  @default(false) @map("ispresent")
+  Remarks         String?   @map("remarks")
+  Created         DateTime? @default(now()) @map("created")
+  Modified        DateTime? @default(now()) @map("modified")
+  meetings        meetings  @relation(fields: [MeetingID], references: [meetingid], onDelete: Cascade)
+  staff           staff     @relation(fields: [StaffID], references: [staffid], onDelete: Cascade)
 
   @@unique([MeetingID, StaffID])
   @@index([StaffID])
 }
 
 model department {
-  DepartmentID   Int       @id @default(autoincrement())
-  DepartmentName String
-  Remarks        String?
-  Created        DateTime? @default(now())
-  Modified       DateTime? @default(now())
+  DepartmentID   Int       @id @default(autoincrement()) @map("departmentid")
+  DepartmentName String    @map("departmentname")
+  Remarks        String?   @map("remarks")
+  Created        DateTime? @default(now()) @map("created")
+  Modified       DateTime? @default(now()) @map("modified")
   staff          staff[]
 }
 
 model venue {
-  VenueID   Int        @id @default(autoincrement())
-  VenueName String
-  Location  String?
-  Remarks   String?
-  Created   DateTime?  @default(now())
-  Modified  DateTime?  @default(now())
+  VenueID   Int        @id @default(autoincrement()) @map("venueid")
+  VenueName String     @map("venuename")
+  Location  String?    @map("location")
+  Remarks   String?    @map("remarks")
+  Created   DateTime?  @default(now()) @map("created")
+  Modified  DateTime?  @default(now()) @map("modified")
   meetings  meetings[]
 }
 
