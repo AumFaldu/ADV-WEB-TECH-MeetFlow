@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+.input {
+  @apply w-full px-3 py-2 rounded-lg border
+  bg-white dark:bg-gray-800
+  border-gray-300 dark:border-gray-600
+  text-gray-900 dark:text-gray-100;
+}
+.label {
+  @apply block text-sm font-medium mb-1
+  text-gray-700 dark:text-gray-300;
+}
+
+.card {
+  @apply bg-white dark:bg-gray-800 rounded-2xl shadow-sm
+  transition-colors;
+}
+
+.page-container {
+  @apply max-w-3xl mx-auto space-y-6;
+}
+
+.btn-primary {
+  @apply px-6 py-2.5 rounded-lg bg-indigo-600 text-white
+  hover:bg-indigo-700 transition font-medium;
+}
+
+.btn-secondary {
+  @apply px-6 py-2.5 rounded-lg border
+  border-gray-300 dark:border-gray-600
+  hover:bg-gray-50 dark:hover:bg-gray-700
+  transition;
+}
+/* LIGHT MODE FIXES */
+.datatable-wrapper .dataTables_wrapper {
+  color: #374151;
+}
+
+/* DARK MODE DATATABLE FULL THEME */
+
+.dark .datatable-wrapper .dataTables_wrapper {
+  color: #e5e7eb;
+}
+
+.dark .datatable-wrapper table.dataTable {
+  background-color: #111827;
+  color: #e5e7eb;
+  border-color: #374151;
+}
+
+.dark .datatable-wrapper table.dataTable thead th {
+  background-color: #1f2937;
+  color: #d1d5db;
+  border-bottom: 1px solid #374151;
+}
+
+.dark .datatable-wrapper table.dataTable tbody tr {
+  background-color: #111827;
+}
+
+.dark .datatable-wrapper table.dataTable tbody tr:hover {
+  background-color: #1f2937;
+}
+
+.dark .datatable-wrapper .dataTables_length select,
+.dark .datatable-wrapper .dataTables_filter input {
+  background-color: #1f2937;
+  color: #e5e7eb;
+  border: 1px solid #374151;
+}
+
+.dark .datatable-wrapper .dataTables_paginate .paginate_button {
+  color: #e5e7eb !important;
+}
+
+.dark .datatable-wrapper .dataTables_paginate .paginate_button.current {
+  background: #4f46e5 !important;
+  color: white !important;
+}
+/* =========================
+   Custom Animations
+   ========================= */
+
+/* Slow Pulse for Background Circles */
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.2); opacity: 0.2; }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 6s infinite;
+}
+.delay-3000 {
+  animation-delay: 3s;
+}
+
+/* Bounce for Alert Icon */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+.animate-bounce {
+  animation: bounce 2s infinite;
+}
+
+/* Smooth hover scaling for buttons */
+.transition-scale {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-scale:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
