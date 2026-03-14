@@ -4,8 +4,12 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
+/// ===========================
+/// USERS
+/// ===========================
 model users {
   UserID       Int        @id @default(autoincrement()) @map("userid")
   StaffID      Int?       @map("staffid")
@@ -16,11 +20,15 @@ model users {
   Created      DateTime?  @default(now()) @map("created")
   Modified     DateTime?  @default(now()) @map("modified")
   UserName     String?    @map("username")
+
   staff        staff?     @relation(fields: [StaffID], references: [StaffID])
 
   @@index([StaffID])
 }
 
+/// ===========================
+/// STAFF
+/// ===========================
 model staff {
   StaffID        Int             @id @default(autoincrement()) @map("staffid")
   StaffName      String          @map("staffname")
@@ -30,6 +38,7 @@ model staff {
   Created        DateTime?       @default(now()) @map("created")
   Modified       DateTime?       @default(now()) @map("modified")
   DepartmentID   Int?            @map("departmentid")
+
   meetingmembers meetingmember[]
   users          users[]
   department     department?     @relation(fields: [DepartmentID], references: [DepartmentID], onDelete: Cascade)
@@ -37,6 +46,9 @@ model staff {
   @@index([DepartmentID])
 }
 
+/// ===========================
+/// MEETINGS
+/// ===========================
 model meetings {
   MeetingID            Int             @id @default(autoincrement()) @map("meetingid")
   MeetingDate          DateTime        @map("meetingdate")
@@ -49,24 +61,31 @@ model meetings {
   CancellationDateTime DateTime?       @map("cancellationdatetime")
   CancellationReason   String?         @map("cancellationreason")
   VenueID              Int?            @map("venueid")
+
   meetingmembers       meetingmember[]
-  meetingtype          meetingtype     @relation(fields: [MeetingTypeID], references: [MeetingTypeID], onDelete: Cascade)
-  venue                venue?          @relation(fields: [VenueID], references: [VenueID], onDelete: Cascade)
+  meetingtype          meetingtype     @relation(fields: [MeetingTypeID], references: [MeetingTypeID])
+  venue                venue?          @relation(fields: [VenueID], references: [VenueID])
 
   @@index([MeetingTypeID])
   @@index([VenueID])
 }
 
-// Similarly, map all other models:
+/// ===========================
+/// MEETING TYPES
+/// ===========================
 model meetingtype {
   MeetingTypeID   Int        @id @default(autoincrement()) @map("meetingtypeid")
   MeetingTypeName String     @map("meetingtypename")
   Remarks         String?    @map("remarks")
   Created         DateTime?  @default(now()) @map("created")
   Modified        DateTime?  @default(now()) @map("modified")
+
   meetings        meetings[]
 }
 
+/// ===========================
+/// MEETING MEMBERS
+/// ===========================
 model meetingmember {
   MeetingMemberID Int       @id @default(autoincrement()) @map("meetingmemberid")
   MeetingID       Int       @map("meetingid")
@@ -75,22 +94,30 @@ model meetingmember {
   Remarks         String?   @map("remarks")
   Created         DateTime? @default(now()) @map("created")
   Modified        DateTime? @default(now()) @map("modified")
-  meetings        meetings  @relation(fields: [MeetingID], references: [MeetingID], onDelete: Cascade)
-  staff           staff     @relation(fields: [StaffID], references: [StaffID], onDelete: Cascade)
+
+  meetings        meetings  @relation(fields: [MeetingID], references: [MeetingID])
+  staff           staff     @relation(fields: [StaffID], references: [StaffID])
 
   @@unique([MeetingID, StaffID])
   @@index([StaffID])
 }
 
+/// ===========================
+/// DEPARTMENT
+/// ===========================
 model department {
   DepartmentID   Int       @id @default(autoincrement()) @map("departmentid")
   DepartmentName String    @map("departmentname")
   Remarks        String?   @map("remarks")
   Created        DateTime? @default(now()) @map("created")
   Modified       DateTime? @default(now()) @map("modified")
+
   staff          staff[]
 }
 
+/// ===========================
+/// VENUE
+/// ===========================
 model venue {
   VenueID   Int        @id @default(autoincrement()) @map("venueid")
   VenueName String     @map("venuename")
@@ -98,9 +125,13 @@ model venue {
   Remarks   String?    @map("remarks")
   Created   DateTime?  @default(now()) @map("created")
   Modified  DateTime?  @default(now()) @map("modified")
+
   meetings  meetings[]
 }
 
+/// ===========================
+/// ENUMS
+/// ===========================
 enum users_Role {
   ADMIN
   CONVENER
