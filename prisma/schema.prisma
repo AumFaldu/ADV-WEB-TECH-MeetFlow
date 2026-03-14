@@ -3,115 +3,104 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model users {
-  UserID        Int         @id @default(autoincrement())
-  StaffID       Int?
-  Email         String?     @unique(map: "Email") @db.VarChar(100)
-  Password_Hash String      @db.VarChar(255)
-  Role          users_Role? @default(STAFF)
-  IsActive      Boolean?    @default(true)
-  Created       DateTime?   @default(now()) @db.Timestamp(0)
-  Modified      DateTime?   @default(now()) @db.Timestamp(0)
-  UserName      String?     @db.VarChar(50)
-  staff         staff?      @relation(fields: [StaffID], references: [StaffID])
+  UserID   Int        @id @default(autoincrement())
+  StaffID  Int?
+  Email    String?    @unique
+  Password_Hash String
+  Role     users_Role? @default(STAFF)
+  IsActive Boolean?   @default(true)
+  Created  DateTime?  @default(now())
+  Modified DateTime?  @default(now())
+  UserName String?
+  staff    staff?     @relation(fields: [StaffID], references: [StaffID])
 
-  @@index([StaffID], map: "users_StaffID_fkey")
+  @@index([StaffID])
 }
 
 model staff {
-  StaffID        Int             @id @default(autoincrement())
-  StaffName      String          @db.VarChar(100)
-  MobileNo       String?         @db.VarChar(15)
-  EmailAddress   String?         @db.VarChar(100)
-  Remarks        String?         @db.VarChar(255)
-  Created        DateTime?       @default(now()) @db.Timestamp(0)
-  Modified       DateTime?       @default(now()) @db.Timestamp(0)
-  DepartmentID   Int?
+  StaffID      Int             @id @default(autoincrement())
+  StaffName    String
+  MobileNo     String?
+  EmailAddress String?
+  Remarks      String?
+  Created      DateTime?       @default(now())
+  Modified     DateTime?       @default(now())
+  DepartmentID Int?
   meetingmembers meetingmember[]
-  users          users[]
-  department     department?     @relation(fields: [DepartmentID], references: [DepartmentID], onDelete: Cascade, map: "FK_Staff_Department")
+  users        users[]
+  department   department?     @relation(fields: [DepartmentID], references: [DepartmentID], onDelete: Cascade)
 
-  @@index([DepartmentID], map: "FK_Staff_Department")
+  @@index([DepartmentID])
 }
 
-/// ===========================
-/// MEETINGS
-/// ===========================
 model meetings {
-  MeetingID            Int             @id @default(autoincrement())
-  MeetingDate          DateTime        @db.DateTime(0)
-  MeetingTypeID        Int
-  MeetingDescription   String?         @db.VarChar(255)
-  DocumentPath         String?         @db.VarChar(255)
-  Created              DateTime?       @default(now()) @db.Timestamp(0)
-  Modified             DateTime?       @default(now()) @db.Timestamp(0)
-  IsCancelled          Boolean?        @default(false)
-  CancellationDateTime DateTime?       @db.DateTime(0)
-  CancellationReason   String?         @db.VarChar(255)
-  VenueID              Int?
-  meetingmembers       meetingmember[]
-  meetingtype          meetingtype     @relation(fields: [MeetingTypeID], references: [MeetingTypeID], onDelete: Cascade, map: "FK_Meetings_MeetingType")
-  venue                venue?          @relation(fields: [VenueID], references: [VenueID], onDelete: Cascade, map: "FK_Meetings_Venue")
+  MeetingID          Int             @id @default(autoincrement())
+  MeetingDate        DateTime
+  MeetingTypeID      Int
+  MeetingDescription String?
+  DocumentPath       String?
+  Created            DateTime?       @default(now())
+  Modified           DateTime?       @default(now())
+  IsCancelled        Boolean?        @default(false)
+  CancellationDateTime DateTime?
+  CancellationReason String?
+  VenueID            Int?
+  meetingmembers     meetingmember[]
+  meetingtype        meetingtype     @relation(fields: [MeetingTypeID], references: [MeetingTypeID], onDelete: Cascade)
+  venue              venue?          @relation(fields: [VenueID], references: [VenueID], onDelete: Cascade)
 
-  @@index([MeetingTypeID], map: "FK_Meetings_MeetingType")
-  @@index([VenueID], map: "FK_Meetings_Venue")
+  @@index([MeetingTypeID])
+  @@index([VenueID])
 }
 
-/// ===========================
-/// MEETING TYPES
-/// ===========================
 model meetingtype {
   MeetingTypeID   Int        @id @default(autoincrement())
-  MeetingTypeName String     @db.VarChar(100)
-  Remarks         String?    @db.VarChar(255)
-  Created         DateTime?  @default(now()) @db.Timestamp(0)
-  Modified        DateTime?  @default(now()) @db.Timestamp(0)
+  MeetingTypeName String
+  Remarks         String?
+  Created         DateTime?  @default(now())
+  Modified        DateTime?  @default(now())
   meetings        meetings[]
 }
 
-/// ===========================
-/// MEETING MEMBERS
-/// ===========================
 model meetingmember {
   MeetingMemberID Int       @id @default(autoincrement())
   MeetingID       Int
   StaffID         Int
   IsPresent       Boolean?  @default(false)
-  Remarks         String?   @db.VarChar(255)
-  Created         DateTime? @default(now()) @db.Timestamp(0)
-  Modified        DateTime? @default(now()) @db.Timestamp(0)
-  meetings        meetings  @relation(fields: [MeetingID], references: [MeetingID], onDelete: Cascade, map: "FK_MeetingMember_Meeting")
-  staff           staff     @relation(fields: [StaffID], references: [StaffID], onDelete: Cascade, map: "FK_MeetingMember_Staff")
+  Remarks         String?
+  Created         DateTime? @default(now())
+  Modified        DateTime? @default(now())
+  meetings        meetings  @relation(fields: [MeetingID], references: [MeetingID], onDelete: Cascade)
+  staff           staff     @relation(fields: [StaffID], references: [StaffID], onDelete: Cascade)
 
-  @@unique([MeetingID, StaffID], map: "UQ_Meeting_Staff")
-  @@index([StaffID], map: "FK_MeetingMember_Staff_idx")
+  @@unique([MeetingID, StaffID])
+  @@index([StaffID])
 }
 
 model department {
   DepartmentID   Int       @id @default(autoincrement())
-  DepartmentName String    @db.VarChar(100)
-  Remarks        String?   @db.VarChar(255)
-  Created        DateTime? @default(now()) @db.Timestamp(0)
-  Modified       DateTime? @default(now()) @db.Timestamp(0)
+  DepartmentName String
+  Remarks        String?
+  Created        DateTime? @default(now())
+  Modified       DateTime? @default(now())
   staff          staff[]
 }
 
 model venue {
   VenueID   Int        @id @default(autoincrement())
-  VenueName String     @db.VarChar(100)
-  Location  String?    @db.VarChar(255)
-  Remarks   String?    @db.VarChar(255)
-  Created   DateTime?  @default(now()) @db.Timestamp(0)
-  Modified  DateTime?  @default(now()) @db.Timestamp(0)
+  VenueName String
+  Location  String?
+  Remarks   String?
+  Created   DateTime?  @default(now())
+  Modified  DateTime?  @default(now())
   meetings  meetings[]
 }
 
-/// ===========================
-/// ENUMS
-/// ===========================
 enum users_Role {
   ADMIN
   CONVENER
