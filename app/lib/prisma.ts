@@ -7,7 +7,6 @@ declare global {
 const prisma =
   global.prisma ||
   new PrismaClient({
-    adapter: postgres({url: process.env.DATABASE_URL}),
     log: ["query", "info", "warn", "error"],
   });
 
