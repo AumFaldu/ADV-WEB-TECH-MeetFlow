@@ -159,7 +159,7 @@ export default function MasterConfigurationPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <MasterCard title="Meeting Types" onAdd={(e) => handleAdd("meetingType", e)}>
+        <MasterCard title="Meeting Types" onAdd={(e:any) => handleAdd("meetingType", e)}>
           <Table
             columns={["Name", "Remarks", "Actions"]}
             data={meetingTypes.map((x) => [x.name, x.remarks || "", x.id])}
