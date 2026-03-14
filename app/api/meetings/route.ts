@@ -15,27 +15,17 @@ export async function GET(req: Request) {
 
   const columns = ["MeetingDate", "meetingtype.MeetingTypeName", "MeetingDescription", "IsCancelled"];
   const orderColumn = columns[orderColumnIndex] || "MeetingDate";
-  // Build search condition
+
+  // Build search condition without `mode` for nullable fields
   const whereCondition: Prisma.meetingsWhereInput = searchValue
-  ? {
-      OR: [
-        {
-          MeetingDescription: {
-            contains: searchValue,
-            mode: "insensitive",
-          },
-        },
-        {
-          meetingtype: {
-            MeetingTypeName: {
-              contains: searchValue,
-              mode: "insensitive",
-            },
-          },
-        },
-      ],
-    }
-  : {};
+    ? {
+        OR: [
+          { MeetingDescription: { contains: searchValue } },
+          { meetingtype: { MeetingTypeName: { contains: searchValue } } },
+        ],
+      }
+    : {};
+
   // Total records
   const totalRecords = await prisma.meetings.count();
   const recordsFiltered = await prisma.meetings.count({ where: whereCondition });
