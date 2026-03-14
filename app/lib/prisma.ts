@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { postgres } from "@prisma/adapter-postgres";
 
 declare global {
   var prisma: PrismaClient | undefined;
