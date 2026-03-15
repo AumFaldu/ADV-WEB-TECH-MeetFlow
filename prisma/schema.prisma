@@ -124,7 +124,7 @@ model venue {
 /// ===========================
 /// ENUMS
 /// ===========================
-enum users_role {
+enum users_Role {
   ADMIN
   CONVENER
   STAFF
