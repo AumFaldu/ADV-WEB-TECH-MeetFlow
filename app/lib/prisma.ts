@@ -6,19 +6,19 @@ import ws from "ws";
 neonConfig.webSocketConstructor = ws;
 
 declare global {
-  var prisma: PrismaClient | undefined;
+  var prismaInstance: PrismaClient | undefined;
 }
 
 const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaNeon({ connectionString });
 
-export const prisma =
-  global.prisma ||
+const client =
+  global.prismaInstance ||
   new PrismaClient({
     adapter,
     log: ["query", "info", "warn", "error"],
   });
 
-if (process.env.NODE_ENV !== "production") global.prisma = prisma;
+if (process.env.NODE_ENV !== "production") global.prismaInstance = client;
 
-export { prisma };
+export { client as prisma };
