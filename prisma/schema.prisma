@@ -14,7 +14,7 @@ model users {
   StaffID      Int?       @map("staffid")
   Email        String?    @unique @map("email")
   Password_Hash String     @map("password_hash")
-  Role         users_Role? @default(STAFF) @map("role")
+  Role         users_role? @default(STAFF) @map("role")
   IsActive     Boolean?   @default(true) @map("isactive")
   Created      DateTime?  @default(now()) @map("created")
   Modified     DateTime?  @default(now()) @map("modified")
@@ -124,7 +124,7 @@ model venue {
 /// ===========================
 /// ENUMS
 /// ===========================
-enum users_Role {
+enum users_role {
   ADMIN
   CONVENER
   STAFF
