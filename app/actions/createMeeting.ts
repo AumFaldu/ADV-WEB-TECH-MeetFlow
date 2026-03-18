@@ -8,7 +8,6 @@ import { v2 as cloudinary } from "cloudinary";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
-// Only allow documents
 const ALLOWED_MIME_TYPES = [
   "application/pdf",
   "application/msword",
@@ -40,22 +39,21 @@ export async function createMeeting(formData: FormData) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Upload as raw file directly
+    // Upload directly as raw binary
     const uploadResult: any = await new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          {
-            folder: "meetflow/meetings",
-            resource_type: "raw", // only raw files
-            public_id: file.name.replace(/\s+/g, "_"),
-            overwrite: true,
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        )
-        .end(buffer);
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: "meetflow/meetings",
+          resource_type: "raw",
+          public_id: file.name.replace(/\s+/g, "_"), // keep extension
+          overwrite: true,
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      stream.end(buffer);
     });
 
     documentPath = uploadResult.secure_url;
