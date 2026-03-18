@@ -3,12 +3,11 @@
 import { prisma } from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
+import cloudinary from "@/app/lib/cloudinary";
 import { requirePermission } from "../lib/auth";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
 const ALLOWED_MIME_TYPES = [
   "application/pdf",
   "application/msword",
@@ -24,43 +23,59 @@ export async function updateMeeting(formData: FormData) {
   const meetingID = Number(formData.get("MeetingID"));
   const meetingDate = formData.get("MeetingDate") as string;
   const meetingTypeID = Number(formData.get("MeetingTypeID"));
-  const meetingDescription = (formData.get("MeetingDescription") as string) || "";
+  const meetingDescription =
+    (formData.get("MeetingDescription") as string) || "";
+
   const venueIDRaw = formData.get("VenueID");
   const venueID = venueIDRaw ? Number(venueIDRaw) : null;
 
-  // File handling
   const file = formData.get("DocumentFile") as File | null;
   const existingPath = formData.get("ExistingDocumentPath") as string;
+
   let documentPath = existingPath || "";
 
   if (file && file.size > 0) {
-    // Check file size
     if (file.size > MAX_FILE_SIZE) {
-      throw new Error("File size exceeds 5 MB limit.");
+      throw new Error("File size exceeds 5MB limit.");
     }
 
-    // Check MIME type
     if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-      throw new Error("Invalid file type. Only PDF, Word, or images allowed.");
+      throw new Error("Invalid file type.");
     }
 
-    // Safe filename and folder structure
-    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const dateFolder = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-    const uploadDir = path.join(process.cwd(), "public/uploads/meetings", dateFolder);
+    if (existingPath) {
+      try {
+        const parts = existingPath.split("/");
+        const fileName = parts[parts.length - 1];
+        const publicId = `meetflow/meetings/${fileName.split(".")[0]}`;
 
-    // Ensure directory exists
-    await mkdir(uploadDir, { recursive: true });
+        await cloudinary.uploader.destroy(publicId, {
+          resource_type: "raw",
+        });
+      } catch (err) {
+        console.log("Old file delete failed", err);
+      }
+    }
 
-    const fileName = `${uuidv4()}-${safeName}`;
-    const uploadPath = path.join(uploadDir, fileName);
-
-    // Write new file
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    await writeFile(uploadPath, buffer);
 
-    documentPath = `/uploads/meetings/${dateFolder}/${fileName}`;
+    const uploadResult: any = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: "meetflow/meetings",
+            resource_type: "raw",
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        )
+        .end(buffer);
+    });
+
+    documentPath = uploadResult.secure_url;
   }
 
   await prisma.meetings.update({
