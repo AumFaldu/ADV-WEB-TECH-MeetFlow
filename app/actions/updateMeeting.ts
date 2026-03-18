@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import cloudinary from "@/app/lib/cloudinary";
 import { requirePermission } from "../lib/auth";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const ALLOWED_MIME_TYPES = [
   "application/pdf",
@@ -43,11 +43,11 @@ export async function updateMeeting(formData: FormData) {
       throw new Error("Invalid file type.");
     }
 
+    // Delete existing file from Cloudinary if present
     if (existingPath) {
       try {
         const urlParts = existingPath.split("/");
         const fileWithExt = urlParts[urlParts.length - 1];
-
         const publicId = `meetflow/meetings/${fileWithExt.substring(
           0,
           fileWithExt.lastIndexOf(".")
@@ -61,18 +61,21 @@ export async function updateMeeting(formData: FormData) {
       }
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Convert file to buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     const originalName = file.name.replace(/\s+/g, "_");
+    const resourceType = file.type.startsWith("image/") ? "image" : "raw";
 
+    // Upload new file to Cloudinary
     const uploadResult: any = await new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
             folder: "meetflow/meetings",
-            resource_type: "raw",
-            public_id: originalName,
+            resource_type: resourceType,
+            public_id: originalName.replace(/\.[^/.]+$/, ""),
             overwrite: true,
           },
           (error, result) => {
@@ -92,11 +95,12 @@ export async function updateMeeting(formData: FormData) {
       MeetingDate: new Date(meetingDate),
       MeetingTypeID: meetingTypeID,
       MeetingDescription: meetingDescription,
-      DocumentPath: documentPath,
       VenueID: venueID,
+      DocumentPath: documentPath,
     },
   });
 
+  // Revalidate meetings path and redirect
   revalidatePath("/meetings");
   redirect("/meetings");
 }
