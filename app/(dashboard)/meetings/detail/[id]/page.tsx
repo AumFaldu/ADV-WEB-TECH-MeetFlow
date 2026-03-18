@@ -4,10 +4,10 @@ import { prisma } from "@/app/lib/prisma";
 export default async function MeetingDetail({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
   const user = await requireAuth();
-  const { id } = await params;
+  const { id } = params;
   const meetingId = Number(id);
 
   const meeting = await prisma.meetings.findUnique({
@@ -51,9 +51,7 @@ export default async function MeetingDetail({
   }
 
   const visibleMembers = isStaff
-    ? meeting.meetingmembers.filter(
-        (m) => m.StaffID === user.staffId
-      )
+    ? meeting.meetingmembers.filter((m) => m.StaffID === user.staffId)
     : meeting.meetingmembers;
 
   let status = "";
@@ -77,9 +75,7 @@ export default async function MeetingDetail({
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-semibold">
-          Meeting Details
-        </h1>
+        <h1 className="text-3xl font-semibold">Meeting Details</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Detailed information about this meeting
         </p>
@@ -87,9 +83,7 @@ export default async function MeetingDetail({
 
       {/* Card */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-8 space-y-6 transition-colors">
-        <Info label="Meeting ID">
-          {meeting.MeetingID}
-        </Info>
+        <Info label="Meeting ID">{meeting.MeetingID}</Info>
 
         <Info label="Date & Time">
           {new Date(meeting.MeetingDate).toLocaleString()}
@@ -101,36 +95,32 @@ export default async function MeetingDetail({
 
         <Info label="Venue">
           {meeting.venue?.VenueName ?? "Not assigned"}
-          {meeting.venue?.Location
-            ? ` — ${meeting.venue.Location}`
-            : ""}
+          {meeting.venue?.Location ? ` — ${meeting.venue.Location}` : ""}
         </Info>
 
-        <Info label="Description">
-          {meeting.MeetingDescription || "—"}
-        </Info>
+        <Info label="Description">{meeting.MeetingDescription || "—"}</Info>
 
+        {/* Document */}
         <div>
-  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-    Document
-  </p>
-  {meeting.DocumentPath ? (
-    <a
-      href={`${meeting.DocumentPath}?fl_attachment=true&filename=${encodeURIComponent(
-        meeting.DocumentPath.split("/").pop() || "document"
-      )}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 text-indigo-600 hover:underline"
-    >
-      View / Download
-    </a>
-  ) : (
-    <p className="text-gray-500 dark:text-gray-400">
-      No document uploaded
-    </p>
-  )}
-</div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+            Document
+          </p>
+          {meeting.DocumentPath ? (
+            <a
+              href={meeting.DocumentPath}
+              target="_blank"
+              rel="noopener noreferrer"
+              download={meeting.DocumentPath.split("/").pop()} // ensures extension is preserved
+              className="inline-flex items-center gap-2 text-indigo-600 hover:underline"
+            >
+              View / Download
+            </a>
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400">
+              No document uploaded
+            </p>
+          )}
+        </div>
 
         <div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
@@ -143,24 +133,21 @@ export default async function MeetingDetail({
           </span>
         </div>
 
-        {meeting.IsCancelled &&
-          meeting.CancellationReason && (
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                Cancellation Reason
-              </p>
-              <p className="text-red-600 dark:text-red-400">
-                {meeting.CancellationReason}
-              </p>
-            </div>
-          )}
+        {meeting.IsCancelled && meeting.CancellationReason && (
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+              Cancellation Reason
+            </p>
+            <p className="text-red-600 dark:text-red-400">
+              {meeting.CancellationReason}
+            </p>
+          </div>
+        )}
 
         {/* Members */}
         <div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-            {isStaff
-              ? "Your Attendance"
-              : "Assigned Members"}
+            {isStaff ? "Your Attendance" : "Assigned Members"}
           </p>
 
           {visibleMembers.length > 0 ? (
@@ -169,22 +156,16 @@ export default async function MeetingDetail({
                 let attendanceLabel = "";
                 let attendanceClass = "";
 
-                if (
-                  !meeting.IsCancelled &&
-                  meetingDate < now
-                ) {
+                if (!meeting.IsCancelled && meetingDate < now) {
                   if (member.IsPresent === true) {
                     attendanceLabel = "Present";
-                    attendanceClass =
-                      "text-green-600 dark:text-green-400";
+                    attendanceClass = "text-green-600 dark:text-green-400";
                   } else if (member.IsPresent === false) {
                     attendanceLabel = "Absent";
-                    attendanceClass =
-                      "text-red-600 dark:text-red-400";
+                    attendanceClass = "text-red-600 dark:text-red-400";
                   } else {
                     attendanceLabel = "Not Marked";
-                    attendanceClass =
-                      "text-gray-500 dark:text-gray-400";
+                    attendanceClass = "text-gray-500 dark:text-gray-400";
                   }
                 }
 
@@ -204,22 +185,17 @@ export default async function MeetingDetail({
                         )}
                     </span>
 
-                    {!meeting.IsCancelled &&
-                      meetingDate < now && (
-                        <span
-                          className={`text-sm font-medium ${attendanceClass}`}
-                        >
-                          {attendanceLabel}
-                        </span>
-                      )}
+                    {!meeting.IsCancelled && meetingDate < now && (
+                      <span className={`text-sm font-medium ${attendanceClass}`}>
+                        {attendanceLabel}
+                      </span>
+                    )}
                   </li>
                 );
               })}
             </ul>
           ) : (
-            <p className="text-gray-500 dark:text-gray-400">
-              No members assigned
-            </p>
+            <p className="text-gray-500 dark:text-gray-400">No members assigned</p>
           )}
         </div>
       </div>
@@ -228,7 +204,6 @@ export default async function MeetingDetail({
 }
 
 /* ---------- Small Reusable UI ---------- */
-
 function Info({
   label,
   children,
@@ -238,12 +213,8 @@ function Info({
 }) {
   return (
     <div>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-        {label}
-      </p>
-      <p className="text-gray-900 dark:text-gray-100">
-        {children}
-      </p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{label}</p>
+      <p className="text-gray-900 dark:text-gray-100">{children}</p>
     </div>
   );
 }
