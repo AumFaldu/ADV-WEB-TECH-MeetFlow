@@ -4,10 +4,10 @@ import { prisma } from "@/app/lib/prisma";
 export default async function MeetingDetail({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const user = await requireAuth();
-  const { id } = params;
+  const { id } = await params;
   const meetingId = Number(id);
 
   const meeting = await prisma.meetings.findUnique({
