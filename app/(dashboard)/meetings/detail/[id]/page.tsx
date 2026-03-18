@@ -110,7 +110,7 @@ export default async function MeetingDetail({
               href={meeting.DocumentPath}
               target="_blank"
               rel="noopener noreferrer"
-              download={meeting.DocumentPath.split("/").pop()} // ensures extension is preserved
+              download={`${meeting.DocumentPath.split("/").pop()}`}
               className="inline-flex items-center gap-2 text-indigo-600 hover:underline"
             >
               View / Download
