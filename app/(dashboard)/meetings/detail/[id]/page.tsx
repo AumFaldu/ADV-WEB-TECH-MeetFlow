@@ -111,24 +111,26 @@ export default async function MeetingDetail({
         </Info>
 
         <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-            Document
-          </p>
-          {meeting.DocumentPath ? (
-            <a
-              href={meeting.DocumentPath + "?fl_attachment"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-indigo-600 hover:underline"
-            >
-              View / Download
-            </a>
-          ) : (
-            <p className="text-gray-500 dark:text-gray-400">
-              No document uploaded
-            </p>
-          )}
-        </div>
+  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+    Document
+  </p>
+  {meeting.DocumentPath ? (
+    <a
+      href={`${meeting.DocumentPath}?fl_attachment=true&filename=${encodeURIComponent(
+        meeting.DocumentPath.split("/").pop() || "document"
+      )}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 text-indigo-600 hover:underline"
+    >
+      View / Download
+    </a>
+  ) : (
+    <p className="text-gray-500 dark:text-gray-400">
+      No document uploaded
+    </p>
+  )}
+</div>
 
         <div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
