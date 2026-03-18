@@ -36,7 +36,6 @@ export default async function MeetingDetail({
   const meetingDate = new Date(meeting.MeetingDate);
   const isStaff = user.role?.toUpperCase() === "STAFF";
 
-  // 🔐 Staff Access Check
   if (isStaff) {
     const isAssigned = meeting.meetingmembers.some(
       (m) => m.StaffID === user.staffId
@@ -51,14 +50,12 @@ export default async function MeetingDetail({
     }
   }
 
-  // 🎯 Filter members for staff
   const visibleMembers = isStaff
     ? meeting.meetingmembers.filter(
         (m) => m.StaffID === user.staffId
       )
     : meeting.meetingmembers;
 
-  // Status Logic
   let status = "";
   let badgeClass = "";
 
@@ -121,6 +118,7 @@ export default async function MeetingDetail({
             <a
               href={meeting.DocumentPath}
               target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-indigo-600 hover:underline"
             >
               View / Download
