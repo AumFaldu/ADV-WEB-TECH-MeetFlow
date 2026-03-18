@@ -45,20 +45,26 @@ export async function updateMeeting(formData: FormData) {
 
     if (existingPath) {
       try {
-        const parts = existingPath.split("/");
-        const fileName = parts[parts.length - 1];
-        const publicId = `meetflow/meetings/${fileName.split(".")[0]}`;
+        const urlParts = existingPath.split("/");
+        const fileWithExt = urlParts[urlParts.length - 1];
+
+        const publicId = `meetflow/meetings/${fileWithExt.substring(
+          0,
+          fileWithExt.lastIndexOf(".")
+        )}`;
 
         await cloudinary.uploader.destroy(publicId, {
           resource_type: "raw",
         });
       } catch (err) {
-        console.log("Old file delete failed", err);
+        console.log("Old file delete failed:", err);
       }
     }
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+
+    const originalName = file.name.replace(/\s+/g, "_");
 
     const uploadResult: any = await new Promise((resolve, reject) => {
       cloudinary.uploader
@@ -66,6 +72,8 @@ export async function updateMeeting(formData: FormData) {
           {
             folder: "meetflow/meetings",
             resource_type: "raw",
+            public_id: originalName,
+            overwrite: true,
           },
           (error, result) => {
             if (error) reject(error);
