@@ -27,7 +27,7 @@ export async function updateMeeting(formData: FormData) {
   
   // Security: If Staff, check assignment
   if (user.role?.toUpperCase() === "STAFF") {
-    const isAssigned = await prisma.meetingmembers.findFirst({
+    const isAssigned = await prisma.meetingmember.findFirst({
       where: { MeetingID: meetingID, StaffID: user.staffId }
     });
     if (!isAssigned) throw new Error("Unauthorized access to this meeting.");
