@@ -116,7 +116,7 @@ export default async function MeetingDetail({
           </p>
           {meeting.DocumentPath ? (
             <a
-              href={meeting.DocumentPath}
+              href={meeting.DocumentPath + "?fl_attachment"}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-indigo-600 hover:underline"
