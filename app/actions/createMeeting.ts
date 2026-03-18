@@ -8,13 +8,11 @@ import { v2 as cloudinary } from "cloudinary";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
+// Only allow documents
 const ALLOWED_MIME_TYPES = [
   "application/pdf",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "image/jpeg",
-  "image/png",
-  "image/gif",
 ];
 
 cloudinary.config({
@@ -28,8 +26,7 @@ export async function createMeeting(formData: FormData) {
 
   const meetingDate = formData.get("MeetingDate") as string;
   const meetingTypeID = Number(formData.get("MeetingTypeID"));
-  const meetingDescription =
-    (formData.get("MeetingDescription") as string) || "";
+  const meetingDescription = (formData.get("MeetingDescription") as string) || "";
   const venueIDRaw = formData.get("VenueID");
   const venueID = venueIDRaw ? Number(venueIDRaw) : null;
 
@@ -37,35 +34,33 @@ export async function createMeeting(formData: FormData) {
   let documentPath = "";
 
   if (file && file.size > 0) {
-    if (file.size > MAX_FILE_SIZE) {
-      throw new Error("File size exceeds 5 MB");
-    }
+    if (file.size > MAX_FILE_SIZE) throw new Error("File size exceeds 5 MB");
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) throw new Error("Invalid file type");
 
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-      throw new Error("Invalid file type");
-    }
-
-    // Determine resource type: images display inline, others as raw
-    const resourceType = file.type.startsWith("image/") ? "image" : "raw";
-
-    // Convert file to base64 for Cloudinary
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const base64File = `data:${file.type};base64,${buffer.toString("base64")}`;
 
-    const originalName = file.name.replace(/\s+/g, "_");
-
-    const uploadResult: any = await cloudinary.uploader.upload(base64File, {
-      folder: "meetflow/meetings",
-      resource_type: resourceType,
-      public_id: originalName,
-      overwrite: true,
+    // Upload as raw file directly
+    const uploadResult: any = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: "meetflow/meetings",
+            resource_type: "raw", // only raw files
+            public_id: file.name.replace(/\s+/g, "_"),
+            overwrite: true,
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        )
+        .end(buffer);
     });
 
     documentPath = uploadResult.secure_url;
   }
 
-  // Save meeting in DB
   await prisma.meetings.create({
     data: {
       MeetingDate: new Date(meetingDate),
@@ -76,7 +71,6 @@ export async function createMeeting(formData: FormData) {
     },
   });
 
-  // Revalidate path and redirect
   revalidatePath("/meetings");
   redirect("/meetings");
 }
