@@ -264,8 +264,8 @@ export default function MasterConfigurationPage() {
                   name="departmentId"
                   defaultValue={editItem.departmentId || ""}
                   className="input"
-                  required={editItem.role!=="Admin"}
-                  disabled={editItem.role==="Admin"}
+                  required={editItem.role!=="ADMIN"}
+                  disabled={editItem.role==="ADMIN"}
                 >
                   <option value="">Select Department</option>
                   {departments.map((d) => (
