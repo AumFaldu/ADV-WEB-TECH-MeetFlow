@@ -42,7 +42,7 @@ type Staff = {
 
 type EditItem =
   | { id: number; name: string; remarks?: string | null; type: "meetingType" | "department" | "venue" }
-  | { id: number; name: string; departmentId: number | null; type: "staff" };
+  | { id: number; name: string; departmentId: number | null; role: string; type: "staff" };
 
 // -------------------- COMPONENT --------------------
 export default function MasterConfigurationPage() {
@@ -205,6 +205,7 @@ export default function MasterConfigurationPage() {
                 id: r[5],
                 name: r[0],
                 departmentId: departments.find((d) => d.name === r[3])?.id || null,
+                role: r[4],
                 type: "staff",
               })
             }
@@ -263,6 +264,8 @@ export default function MasterConfigurationPage() {
                   name="departmentId"
                   defaultValue={editItem.departmentId || ""}
                   className="input"
+                  required={editItem.role!=="Admin"}
+                  disabled={editItem.role==="Admin"}
                 >
                   <option value="">Select Department</option>
                   {departments.map((d) => (
