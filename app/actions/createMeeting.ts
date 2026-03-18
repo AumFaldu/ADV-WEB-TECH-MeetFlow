@@ -57,7 +57,7 @@ export async function createMeeting(formData: FormData) {
     const uploadResult: any = await cloudinary.uploader.upload(base64File, {
       folder: "meetflow/meetings",
       resource_type: resourceType,
-      public_id: file.name.replace(/\s+/g, "_").replace(/\.[^/.]+$/, ""), // remove extension
+      public_id: file.name.replace(/\s+/g, "_").replace(/\.[^/.]+$/, ""), // remove extension for Cloudinary
       overwrite: true,
     });
 
