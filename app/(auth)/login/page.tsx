@@ -7,14 +7,11 @@ import { checkLogin } from "@/app/actions/checkLogin";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const loginActionWrapper = (prevState: { errors?: Record<string, string[]>; message?: string } | null) => {
-  const form = document.querySelector("form")!;
-  const formData = new FormData(form as HTMLFormElement);
-  return checkLogin(prevState, formData);
-};
-  const [state, formAction] = useActionState<
-    { errors?: Record<string, string[]>; message?: string } | null
-  >(loginActionWrapper, null);
+  const [state, formAction] = useActionState(
+  (prevState: { errors?: Record<string, string[]>; message?: string } | null, formData: FormData) =>
+    checkLogin(prevState, formData),
+  null
+);
 
 
   return (
