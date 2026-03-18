@@ -45,27 +45,17 @@ export async function createMeeting(formData: FormData) {
       throw new Error("Invalid file type");
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const bytes = await file.arrayBuffer()
+const buffer = Buffer.from(bytes)
 
-    const originalName = file.name.replace(/\s+/g, "_");
+const base64File = `data:${file.type};base64,${buffer.toString("base64")}`
 
-    const uploadResult: any = await new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          {
-            folder: "meetflow/meetings",
-            resource_type: "raw",
-            public_id: originalName,
-            overwrite: true,
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        )
-        .end(buffer);
-    });
+const uploadResult: any = await cloudinary.uploader.upload(base64File, {
+  folder: "meetflow/meetings",
+  resource_type: "raw",
+  public_id: file.name.replace(/\s+/g, "_"),
+  overwrite: true,
+});
 
     documentPath = uploadResult.secure_url;
   }
