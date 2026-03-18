@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { requirePermission } from "../lib/auth";
 import { v2 as cloudinary } from "cloudinary";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const ALLOWED_MIME_TYPES = [
   "application/pdf",
@@ -45,21 +45,26 @@ export async function createMeeting(formData: FormData) {
       throw new Error("Invalid file type");
     }
 
-    const bytes = await file.arrayBuffer()
-const buffer = Buffer.from(bytes)
+    // Determine resource type: images display inline, others as raw
+    const resourceType = file.type.startsWith("image/") ? "image" : "raw";
 
-const base64File = `data:${file.type};base64,${buffer.toString("base64")}`
+    // Convert file to base64 for Cloudinary
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64File = `data:${file.type};base64,${buffer.toString("base64")}`;
 
-const uploadResult: any = await cloudinary.uploader.upload(base64File, {
-  folder: "meetflow/meetings",
-  resource_type: "raw",
-  public_id: file.name.replace(/\s+/g, "_"),
-  overwrite: true,
-});
+    // Upload to Cloudinary
+    const uploadResult: any = await cloudinary.uploader.upload(base64File, {
+      folder: "meetflow/meetings",
+      resource_type: resourceType,
+      public_id: file.name.replace(/\s+/g, "_").replace(/\.[^/.]+$/, ""), // remove extension
+      overwrite: true,
+    });
 
     documentPath = uploadResult.secure_url;
   }
 
+  // Save meeting in DB
   await prisma.meetings.create({
     data: {
       MeetingDate: new Date(meetingDate),
@@ -70,6 +75,7 @@ const uploadResult: any = await cloudinary.uploader.upload(base64File, {
     },
   });
 
+  // Revalidate path and redirect
   revalidatePath("/meetings");
   redirect("/meetings");
 }
