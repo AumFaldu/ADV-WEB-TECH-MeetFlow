@@ -53,7 +53,7 @@ const UserProfileCard: FC<UserProfileCardProps> = ({ user }) => {
           </div>
         )}
 
-        {user.StaffID && (
+        {(user.role==="STAFF" || user.role==="CONVENER") && (
           <>
             <div className="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition">
               <FaUser className="text-gray-500 dark:text-gray-400" />
