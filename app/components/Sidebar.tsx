@@ -38,63 +38,74 @@ export default function Sidebar({
       roles: ["ADMIN", "CONVENER", "STAFF"],
     },
     {
+      name: "Reports",
+      href: "/reports",
+      icon: <BarChart2 size={20} />,
+      roles: ["ADMIN", "CONVENER"],
+    },
+    {
+      name: "Master",
+      href: "/master-configuration",
+      icon: <Settings size={20} />,
+      roles: ["ADMIN"],
+    },
+    {
       name: "Profile",
       href: "/profile",
       icon: <User size={20} />,
       roles: ["ADMIN", "CONVENER", "STAFF"],
     },
-    {
-      name: "Master Configuration",
-      href: "/master-configuration",
-      icon: <Settings size={20} />,
-      roles: ["ADMIN"], // Only admin
-    },
-    {
-      name: "Reports",
-      href: "/reports",
-      icon: <BarChart2 size={20} />,
-      roles: ["ADMIN", "CONVENER"], // Staff can't see
-    },
   ];
 
-  // 🔐 Filter links based on role
-  const links = allLinks.filter((link) =>
-    link.roles.includes(role)
-  );
+  const links = allLinks.filter((l) => l.roles.includes(role));
 
   return (
     <aside
       className={clsx(
-        "flex flex-col transition-all duration-300 overflow-hidden",
-        collapsed ? "w-16 p-2" : "w-64 p-6",
-        darkMode ? "bg-gray-900 text-white" : "bg-indigo-700 text-white"
+        "h-screen sticky top-0 transition-all duration-300 border-r",
+        collapsed ? "w-16 px-2 py-4" : "w-64 px-4 py-6",
+        darkMode
+          ? "bg-slate-900 border-slate-800 text-slate-200"
+          : "bg-white border-slate-200 text-slate-700"
       )}
     >
       {!collapsed && (
-        <h2 className="text-xl font-bold mb-6">MeetFlow</h2>
+        <h2 className="text-xl font-semibold mb-8 tracking-tight">
+          MeetFlow
+        </h2>
       )}
 
-      <nav className="flex flex-col gap-2">
-        {links.map((link) => (
-          <Link
-            key={link.name}
-            href={link.href}
-            className={clsx(
-              "flex items-center gap-2 rounded-lg transition-colors duration-300",
-              collapsed ? "justify-center px-0 py-2" : "px-3 py-2",
-              pathname.startsWith(link.href)
-                ? darkMode
-                  ? "bg-gray-700 font-semibold"
-                  : "bg-indigo-900 font-semibold"
-                : darkMode
-                ? "hover:bg-gray-700"
-                : "hover:bg-indigo-600"
-            )}
-          >
-            {link.icon}
-            {!collapsed && <span>{link.name}</span>}
-          </Link>
-        ))}
+      <nav className="flex flex-col gap-1">
+        {links.map((link) => {
+          const active = pathname.startsWith(link.href);
+
+          return (
+            <Link
+              key={link.name}
+              href={link.href}
+              title={collapsed ? link.name : ""}
+              className={clsx(
+                "relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all",
+                collapsed && "justify-center",
+                active
+                  ? darkMode
+                    ? "bg-slate-800 text-white"
+                    : "bg-slate-100 text-slate-900"
+                  : darkMode
+                  ? "hover:bg-slate-800 hover:text-white"
+                  : "hover:bg-slate-100 hover:text-slate-900"
+              )}
+            >
+              {active && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r bg-indigo-500" />
+              )}
+
+              {link.icon}
+
+              {!collapsed && <span>{link.name}</span>}
+            </Link>
+          );
+        })}
       </nav>
     </aside>
   );
