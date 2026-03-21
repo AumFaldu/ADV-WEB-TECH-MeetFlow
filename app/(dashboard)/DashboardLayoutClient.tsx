@@ -19,28 +19,30 @@ export default function DashboardLayoutClient({
   const { darkMode } = useDarkMode();
 
   return (
-  <div
-    className={`flex min-h-screen transition-colors
-      ${darkMode
-        ? "bg-gray-950 text-gray-100"
-        : "bg-gray-50 text-gray-900"
-      }`}
-  >
-    <Sidebar
-      collapsed={collapsed}
-      darkMode={darkMode}
-      role={role}
-    />
+    <div
+      className={`flex min-h-screen transition-colors
+        ${darkMode
+          ? "bg-gray-950 text-gray-100"
+          : "bg-gray-50 text-gray-900"
+        }`}
+    >
+      <Sidebar
+        collapsed={collapsed}
+        darkMode={darkMode}
+        role={role}
+      />
 
-    <div className="flex flex-col flex-1">
-      <Header toggleSidebar={() => setCollapsed(!collapsed)} />
+      <div className="flex flex-col flex-1">
+        <Header
+          toggleSidebar={() => setCollapsed(!collapsed)}
+        />
 
-      <main className="flex-1 p-6 transition-colors">
-        {children}
-      </main>
+        <main className="flex-1 p-6 transition-colors">
+          {children}
+        </main>
 
-      <Footer darkMode={darkMode} />
+        <Footer darkMode={darkMode} />
+      </div>
     </div>
-  </div>
-);
+  );
 }
