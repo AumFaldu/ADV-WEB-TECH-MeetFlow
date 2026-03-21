@@ -24,8 +24,8 @@ export type Permission =
   | "DELETE_DEPARTMENT"
   | "EDIT_DEPARTMENT";
 
-export const rolePermissions: Record<Role, Permission[]> = {
-  ADMIN: [
+export const rolePermissions: Record<Role, Set<Permission>> = {
+  ADMIN: new Set([
     "MANAGE_VENUE",
     "VIEW_VENUE",
     "VIEW_STAFF",
@@ -48,9 +48,9 @@ export const rolePermissions: Record<Role, Permission[]> = {
     "MARK_ATTENDANCE",
     "VIEW_REPORT",
     "EXPORT_REPORT",
-  ],
+  ]),
 
-  CONVENER: [
+  CONVENER: new Set([
     "VIEW_DASHBOARD",
     "CREATE_MEETING",
     "EDIT_MEETING",
@@ -62,16 +62,17 @@ export const rolePermissions: Record<Role, Permission[]> = {
     "EXPORT_REPORT",
     "VIEW_MEETING_TYPE",
     "VIEW_VENUE",
-  ],
+  ]),
 
-  STAFF: [
+  STAFF: new Set([
     "VIEW_DASHBOARD",
     "VIEW_MEETING",
-  ],
+  ]),
 };
+
 export function hasPermission(
   role: Role,
   permission: Permission
 ): boolean {
-  return rolePermissions[role]?.includes(permission) ?? false;
+  return rolePermissions[role]?.has(permission) ?? false;
 }
