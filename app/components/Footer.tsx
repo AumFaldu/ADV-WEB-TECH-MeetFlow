@@ -7,13 +7,13 @@ interface FooterProps {
 export default function Footer({ darkMode }: FooterProps) {
   return (
     <footer
-      className={`mt-auto px-6 py-3 text-xs flex justify-between items-center transition-colors
-        ${darkMode ? "bg-gray-900 text-gray-400" : "bg-white text-gray-500"}`}
+      className={`px-8 py-3 text-xs border-t
+      ${darkMode
+        ? "border-slate-800 text-slate-500"
+        : "border-slate-200 text-slate-400"}
+    `}
     >
-      <span>
-        © {new Date().getFullYear()} <strong>MeetFlow</strong> — MOM System
-      </span>
-      <span className="italic opacity-80">Crafted by Aum Faldu</span>
+      © {new Date().getFullYear()} MeetFlow
     </footer>
   );
 }
